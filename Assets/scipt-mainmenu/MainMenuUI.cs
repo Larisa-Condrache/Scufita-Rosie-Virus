@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuUI : MonoBehaviour
 {
+    public GameObject mainMenuPanel;
     public GameObject optionsPanel;
 
     public void StartGame()
@@ -12,12 +13,8 @@ public class MainMenuUI : MonoBehaviour
 
     public void OpenOptions()
     {
+        mainMenuPanel.SetActive(false);
         optionsPanel.SetActive(true);
-    }
-
-    public void CloseOptions()
-    {
-        optionsPanel.SetActive(false);
     }
 
     public void QuitGame()
