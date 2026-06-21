@@ -2,22 +2,20 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    // idle-run animation
     public Animator animator;
 
-    // Movement
     public float runSpeed = 5f;
     public float stealthSpeed = 3f;
 
-    // Jump
     public float jumpForce = 10f;
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
 
-    // Ground check
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
+
+    public bool isDead = false;
 
     private Rigidbody2D rb;
     private float moveInput;
@@ -28,12 +26,24 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        currentSpeed = runSpeed;
     }
 
     void Update()
     {
+        if (isDead)
+        {
+            moveInput = 0f;
+
+            animator.SetBool("isWalking", false);
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isJumping", false);
+            animator.SetBool("isDead", true);
+
+            return;
+        }
+
         moveInput = Input.GetAxisRaw("Horizontal");
-        // bool pt running & walking animation
 
         bool isMoving = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) ||
                         Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow);
@@ -53,34 +63,30 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("isWalking", isWalking);
         animator.SetBool("isRunning", isRunning);
 
-
-        //debug log to check if the input is being received
-        //print("Move Input: " + moveInput);
-
         isGrounded = Physics2D.OverlapCircle(
             groundCheck.position,
             groundCheckRadius,
             groundLayer
         );
 
-        //jumping animation
         animator.SetBool("isJumping", !isGrounded);
 
-
-        // Jump
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
-        // Hold Left Ctrl to move slowly
         currentSpeed = isWalking ? stealthSpeed : runSpeed;
-
     }
-
 
     void FixedUpdate()
     {
+        if (isDead)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         float targetSpeed = moveInput * currentSpeed;
 
         rb.linearVelocity = new Vector2(targetSpeed, rb.linearVelocity.y);
