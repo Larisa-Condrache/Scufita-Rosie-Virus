@@ -22,6 +22,23 @@ public class PlayerMovement : MonoBehaviour
     public float pistolAttackDuration = 0.35f;
     public float rifleAttackDuration = 0.4f;
 
+    [Header("Attack Damage")]
+    public int knifeDamage = 25;
+    public int pistolDamage = 20;
+    public int rifleDamage = 35;
+
+    [Header("Attack Range")]
+    public Transform attackPoint;
+    public float knifeRange = 0.8f;
+    public float pistolRange = 6f;
+    public float rifleRange = 10f;
+    public LayerMask enemyLayer;
+
+    [Header("Attack Timing")]
+    public float knifeHitDelay = 0.2f;
+    public float pistolHitDelay = 0.15f;
+    public float rifleHitDelay = 0.15f;
+
     private Rigidbody2D rb;
     private float moveInput;
     private bool isGrounded;
@@ -142,18 +159,74 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("isAttacking", true);
 
         float duration = 0.4f;
+        float hitDelay = 0.15f;
 
         if (weapon == 1)
+        {
             duration = knifeAttackDuration;
+            hitDelay = knifeHitDelay;
+        }
         else if (weapon == 2)
+        {
             duration = pistolAttackDuration;
+            hitDelay = pistolHitDelay;
+        }
         else if (weapon == 3)
+        {
             duration = rifleAttackDuration;
+            hitDelay = rifleHitDelay;
+        }
 
-        yield return new WaitForSeconds(duration);
+        yield return new WaitForSeconds(hitDelay);
+
+        DealDamage(weapon);
+
+        float remainingTime = duration - hitDelay;
+
+        if (remainingTime > 0)
+            yield return new WaitForSeconds(remainingTime);
 
         animator.SetBool("isAttacking", false);
         isAttacking = false;
+    }
+
+    void DealDamage(int weapon)
+    {
+        if (attackPoint == null)
+            return;
+
+        float range = 0f;
+        int damage = 0;
+
+        if (weapon == 1)
+        {
+            range = knifeRange;
+            damage = knifeDamage;
+        }
+        else if (weapon == 2)
+        {
+            range = pistolRange;
+            damage = pistolDamage;
+        }
+        else if (weapon == 3)
+        {
+            range = rifleRange;
+            damage = rifleDamage;
+        }
+
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            range,
+            enemyLayer
+        );
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            ZombieHealth zombie = enemy.GetComponent<ZombieHealth>();
+
+            if (zombie != null)
+                zombie.TakeDamage(damage);
+        }
     }
 
     void ResetMovementAnimations()
@@ -161,5 +234,13 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("isWalking", false);
         animator.SetBool("isRunning", false);
         animator.SetBool("isJumping", false);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null)
+            return;
+
+        Gizmos.DrawWireSphere(attackPoint.position, knifeRange);
     }
 }
