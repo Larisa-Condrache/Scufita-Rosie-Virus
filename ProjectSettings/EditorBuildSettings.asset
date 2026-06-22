@@ -12,8 +12,17 @@ EditorBuildSettings:
     path: Assets/MainMenu.unity
     guid: 4482aa492c106ea4286bf19cc5cd93b3
   - enabled: 1
+    path: Assets/ScenaBunicii.unity
+    guid: f8a20efced1bdb349bb8161bf7477add
+  - enabled: 1
     path: Assets/GameScene.unity
     guid: cc0d136f5651b7d49bbb223da1abf584
+  - enabled: 1
+    path: Assets/PrimulLab.unity
+    guid: 998702bdd69b7614b9ac6ce8b222cb94
+  - enabled: 1
+    path: Assets/UltimaScena.unity
+    guid: 399a2dfef7ec667478372a8321e5a9de
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
